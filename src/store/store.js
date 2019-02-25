@@ -1,14 +1,21 @@
 import Vue from 'vue';
 import Vuex from 'vuex'
 import axios from 'axios';
-import moment from 'moment'
-import racecard from './modules/Racecard'
+import racecard from './modules/Racecard';
+import races from  './modules/Races';
+import runners from  './modules/Runners';
+import rp from  './modules/RacingPost';
+import betslip from  './modules/Bets';
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
     modules:{
-        racecard
+        racecard,
+        races,
+        runners,
+        rp,
+        betslip
     }
     // state:{
     //     Racecard: undefined,

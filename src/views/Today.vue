@@ -1,43 +1,58 @@
 <template>
     <div>
-      <v-container class="my-5" grid-list-md text-xs-center>
+      <v-container class="mt-5" grid-list-md pa-0>
       <v-layout row wrap>
-        <v-flex xs12 offset-sm3>
-          <v-card flat class="grey lighten-3" pa-3>
-            <v-card-title primary-title>
-              <div>
-                <h3 class="headline mb-0 Grey--text text--lighten-2">Today's Racing</h3>
-              </div>
+        <v-flex xs12 md12>
+          <v-card flat class="" ma-1>
+            <v-card-title title>
+                <h5 class="headline mb-0 Grey--text text--lighten-2">Today's Racing</h5>
             </v-card-title>
-
-      <v-layout row wrap justify-center>
-        <v-flex xs11 v-for="meeting in racecard.Meetings" :key="meeting.number">
-          <v-card class="grey lighten-5 grey--text text--darken-2">
-            <v-card-title primary-title>
-              <div>
-                <div class="mb-0 Grey--text text--lighten-2 d-inline">{{meeting.Name}}</div><div class="d-inline"> ( {{getstatus(meeting.MeetingStatus)}} )</div>
-              </div>
-            </v-card-title>
-            <v-card-actions>
-              <v-layout row wrap >
-                <v-flex xs4 md2 v-for="myrace in meeting.Races" :key="myrace.Number">
-                    <v-btn flat small color="green" :to="getlink(myrace.Off)">{{myrace.Off}}</v-btn>
-                </v-flex>
-              </v-layout>
-            </v-card-actions>
           </v-card>
+         <v-divider></v-divider>
+        </v-flex>
+      </v-layout> 
+      <v-layout row wrap>
+        <v-flex xs12 md12  v-for="meeting in racecard.Meetings" :key="meeting.number" flat>
+            <v-layout row wrap  align-center justify-space-around v-if="meetingvisible(meeting)" mx-2 my-1>
+                <v-flex xs12 md3 mt-2 mb-1>
+                  <div class="title mb-0 grey--text text--darken-2">
+                    {{meeting.Name}}
+                  </div>
+                </v-flex>               
+                <v-spacer></v-spacer>
+                <div v-for="pool in meeting.MeetingPools" :key="meeting.Number + '_' + pool.Number">
+                <v-flex xs6 md2  class="text-xs-right" v-if="poolactive(pool, meeting)">
+                  <v-btn 
+                    :color="getpoolscolor(pool.Name)" 
+                    class="text-none" 
+                    flat small 
+                    :to="getlink(pool.Name)"
+                    >
+                    <b>tote</b>{{pool.Name.toLowerCase()}}
+                  </v-btn>
+                </v-flex>
+                </div>
+              </v-layout>
+
+              <v-layout row wrap align-center justify-space-left>
+                <div v-for="myrace in meeting.Races" :key="myrace.Number">
+                  <v-flex xs3 md1 v-if="myrace.RacePoolsCount != 0">
+                      <v-btn :color="getcolor(myrace.ScheduledStart)" class="body2" fab flat small v-ripple :to="getlink(myrace.RaceUID)">{{myrace.ScheduledStart}}
+                      </v-btn>
+                  </v-flex>
+                </div>
+              </v-layout>
+          
+          <v-divider></v-divider>
         </v-flex>
         
       </v-layout>
-                </v-card>
-        </v-flex>
-
-      </v-layout> 
-
       </v-container>
     </div>
 </template>
 <script>
+import moment from 'moment';
+
 export default {
   name: 'home',
   computed: {
@@ -46,9 +61,57 @@ export default {
       }
   },
   methods:{
-    getlink(date)
+    racestatus(time)
     {
-      return "/race/" + date;
+      var racetime = moment(time,"HH:mm");
+      var nowtime = moment();
+
+      if ( nowtime.isSameOrAfter( racetime ))
+        return false;
+      else
+        return true;
+    },
+    getpoolscolor(name)
+    {
+      switch (name.toLowerCase()){
+        case "placepot":
+          return "blue";
+        case "quadpot":
+          return "cyan";
+        case "treble":
+          return "purple";
+        case "double":
+          return "pink";
+        case "jackpot":
+          return "red";
+
+
+            }
+    },
+    getcolor(time)
+    {     
+      if (!this.racestatus(time))
+        return "red";
+      else
+        // console.log (time + " ----- " + racetime.format("HH:MM") + "is not before " + nowtime.format("HH:MM") )
+        return "green";
+    },
+    meetingvisible(meeting)
+    {
+      if(meeting.Name.toLowerCase() == "scoop6")
+        return false;
+      else return true;
+    },
+    poolactive(pool, meeting)
+    {
+        let firstleg = pool.FirstLeg;
+        let race = meeting.Races.find( race => race.number == firstleg);
+        console.log(meeting.Name + "_" + pool.Name + "_"+ firstleg + "_" + race.ScheduledStart )
+        return this.racestatus(race.ScheduledStart);
+    },
+    getlink(raceUID)
+    {
+      return "/race/" + raceUID;
     },
     getstatus(statusid)
     {
@@ -61,11 +124,9 @@ export default {
           return "CANCELLED"
         case 6:
           return "DELAYED"
-        case 6:
-          return "POSTPONED"
-        case 6:
+        case 7:
           return "RESCHEDULED"
-      }
+       }
 
     }
 
@@ -73,3 +134,8 @@ export default {
 
 }
 </script>
+<style>
+li a {
+    text-decoration: none;
+    }
+</style>

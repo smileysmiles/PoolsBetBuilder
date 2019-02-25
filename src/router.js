@@ -9,7 +9,7 @@ export default new Router({
     {
       path: '/',
       name: 'home',
-      component: Home
+      component: () => import(/* webpackChunkName: "about" */ './views/Today.vue')
     },
     {
       path: '/Today',
@@ -28,7 +28,7 @@ export default new Router({
       component: () => import(/* webpackChunkName: "about" */ './views/Meeting.vue')
     },
     {
-      path: '/Race',
+      path: '/race/:UID',
       name: 'Race',
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route

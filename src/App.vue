@@ -2,13 +2,15 @@
   <div id="app">
     <Navbar></Navbar>
     <router-view/>
+    <Footer></Footer>
   </div>
 </template>
 <script>
   import Navbar from '@/components/Navbar.vue'
+  import Footer from '@/components/Footer.vue'
 
   export default{
-    components:{ Navbar },
+    components:{ Navbar, Footer },
     data (){
       return {
         items:[
@@ -22,6 +24,7 @@
     },
     created(){
       this.$store.dispatch('initRacecard');
+      this.$store.dispatch('initRaces');
     }
   }
 </script>

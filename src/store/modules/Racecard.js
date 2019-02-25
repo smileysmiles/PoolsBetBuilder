@@ -21,7 +21,7 @@ const actions = {
 
 const getters ={
     racecard: state => {
-        return state.racecards;
+        return state.racecards.Items[0];
     }
 };
 
