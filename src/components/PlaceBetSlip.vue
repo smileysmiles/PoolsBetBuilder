@@ -3,7 +3,7 @@
     <v-layout row wrap class="body-2">
         <v-flex xs12 md12 >
             <v-layout row wrap class="caption fill-height align-center justify-space-around">
-                <v-flex xs1 md1 >
+                <v-flex xs1 md1>
                     <span class="grey--text text--lighten-1">No.</span>
                 </v-flex>
                 <v-flex xs1 md1 >
@@ -11,7 +11,7 @@
                 </v-flex>
                 <v-flex xs4><span class="grey--text text--lighten-1">Name</span></v-flex>
                 <v-flex xs4>
-                    <span class="grey--text text--lighten-1">WIN</span>
+                    <span class="grey--text text--lighten-1">Place</span>
                 </v-flex>
             </v-layout>                         
             <v-divider></v-divider>
@@ -30,7 +30,7 @@
             </v-flex>
             <v-flex xs4  class="font-weight-bold">{{runner.Name}}</v-flex>
             <v-flex xs4>
-                <v-checkbox v-model="selectedwinners" :value="runner.RunnerUID" @change="togglebets(Race.MeetingUID, Race.UID, runner.RunnerUID)">
+                <v-checkbox v-model="selectedplaced" :value="runner.RunnerUID" @change="togglebets(Race.MeetingUID, Race.UID, runner.RunnerUID)">
                 </v-checkbox>
             </v-flex>           
             </v-layout>                         
@@ -44,25 +44,25 @@ export default {
     name:"WinBetslip",
     data (){
         return{
-            selectedwinners:[]
+            selectedplaced:[]
         }
     },
     props: [    
             'Race'
             ],
     computed: {
-    winbets: function() {
-        return this.$store.getters.winbets;
+    placebets: function() {
+        return this.$store.getters.placebets;
       },
     },
     methods:{
     togglebets: function( meetingUID, raceUID, runnerUID )
     {     
       let arr =[];
-      if (this.winbets !== undefined) 
+      if (this.placebets !== undefined) 
       {
-        arr = this.winbets.filter(item => item.runner !== runnerUID);
-        if ( this.winbets.length == arr.length )
+        arr = this.placebets.filter(item => item.runner !== runnerUID);
+        if ( this.placebets.length == arr.length )
         {
           arr.push( { meeting : meetingUID, race : raceUID, runner : runnerUID });
         }
@@ -72,12 +72,12 @@ export default {
         arr.push( { meeting : meetingUID, race : raceUID, runner : runnerUID });
       }
     
-      this.$store.commit('SET_WINBETS', arr)
+      this.$store.commit('SET_PLACEBETS', arr)
     },
   },
     created(){
     this.UID = this.$route.params.UID;   
-    this.selectedwinners = this.winbets.filter(item => item.race == this.UID).map(bet => bet.runner);
+    this.selectedplaced = this.placebets.filter(item => item.race == this.UID).map(bet => bet.runner);
   }
 }
 </script>
