@@ -107,34 +107,65 @@
             <v-card-title pb-1 v-if='bettype!="invalid"'><span class="cyan--text text--lighten-3">tote</span><span class="cyan--text ">exacta {{bettype}}</span></v-card-title>
             <v-card-title pb-1 v-else>No Valid Bet</v-card-title>
             <v-card-text pb-1 v-if='bettype!="invalid"'>
-                    <v-layout slot="header" wrap class="body-2" mx-2>
-                        <v-flex xs-6>
-                            <v-list>
-                            <v-list-tile
-                                v-for="selection in allselections" :key="selection"
-                            >
-
-                                <v-list-tile-content>
-                                <v-list-tile-title v-text="selection"></v-list-tile-title>
-                                </v-list-tile-content>
-
-                            </v-list-tile>
-                            </v-list>
+                <v-container fluid grid-list-md>
+                    <v-layout row wrap>
+                        <v-flex xs12 md6 d-flex>
+                            <v-layout row wrap>
+                                <v-flex xs12 sm12 md12  d-flex v-for="selection in allselections" :key="selection.UID">                          
+                                    <v-layout row wrap>
+                                        <v-flex xs3 dflex class="cyan--text body-1">
+                                            {{selection.position}}
+                                        </v-flex>
+                                        <v-flex xs2 dflex class="caption">
+                                            ({{selection.Number}})
+                                        </v-flex>
+                                        <v-flex xs6 dflex class="body-1">
+                                            {{selection.Name}}
+                                        </v-flex>
+                                    </v-layout>
+                                </v-flex>
+                            </v-layout>
                         </v-flex>
-                        <v-flex xs-6>
-<v-list>
-                            <v-list-tile
-                                v-for="selection in allselections" :key="selection"
-                            >
+                        <v-flex xs12 md6 d-flex>
+                            <v-layout row wrap align-center justify-space-around >
+                        <v-flex xs12 md12 d-flex>
+                            <v-layout row wrap align-center justify-space-around >
+                            <v-flex xs3 md2>
+                                <span>{{lines}}</span>
+                            </v-flex>
+                            <v-flex xs3 md2>
+                                <span>X</span>
+                            </v-flex>
+                            <v-flex xs6 md4>
+                                <v-text-field dark
+                                    v-model="stake"
+                                    label="Stake"
+                                    :rules="[rules.minstake]"
+                                    prefix="£"
+                                    type="number"
+                                ></v-text-field>
+                            </v-flex>
+                            </v-layout>
+                        </v-flex>
 
-                                <v-list-tile-content>
-                                <v-list-tile-title v-text="selection"></v-list-tile-title>
-                                </v-list-tile-content>
-
-                            </v-list-tile>
-                            </v-list>
+                        <v-flex xs12 md12 d-flex>
+                            <v-layout row wrap align-center justify-space-around >                
+                            <v-flex xs5 sm3>
+                                <v-text-field dark
+                                    v-model="total"
+                                    label="Total"
+                                    :rules="[rules.mintotalstake, rules.maxtotalstake]"
+                                    prefix="£"
+                                    type="number"
+                                    readonly
+                                ></v-text-field>
+                            </v-flex>
+                            </v-layout>
+                        </v-flex>
+                            </v-layout>
                         </v-flex>
                     </v-layout>
+                </v-container>
             </v-card-text>
             <v-card-actions v-if='bettype!="invalid"'>
                 <v-btn>Add</v-btn>
@@ -152,7 +183,13 @@ export default {
             perms: [],
             runners: null,
             hidden: false,
-            banker: false
+            banker: false,
+            stake: 0,
+            rules:{
+                minstake: value => value >= 0.1 || "Minimum bet is £0.10",
+                mintotalstake: value => value >= 2 || "Minimum Total Stake is £2.00",
+                maxtotalstake: value => value <= 100000 || "Maximum Total Stake is £100,000"
+            }
         }
     },
     props: [    
@@ -166,13 +203,39 @@ export default {
         {
             case "banker":
             case "straight":
-                selections = [ ...this.first, ...this.second]
-                console.log(selections)
+                var array1 = this.first.map(first => {
+                    return {
+                        UID: first,
+                        position: this.banker ? "bkr" : "1st"
+                    }
+                })
+                var array2 = this.second.map(second => {
+                    return {
+                        UID: second,
+                        position: "2nd"
+                    }
+                })
+                selections = [ ...array1, ...array2]
+                
                 break;
             case "combination":
-                selections = [ ...this.perms ]
+                selections = this.perms.map( perm => {
+                    return {
+                        UID: perm,
+                        position: "ANY"
+                    }
+                })
                 break;
         }
+        console.log(selections)
+
+        selections = selections.map( selection => {
+            var runner = this.runners.find( runner => runner.RunnerUID == selection.UID )
+            return {
+                ...runner,
+                position: selection.position               
+            };
+        });
 
         return selections;
     },
@@ -225,7 +288,11 @@ export default {
             case "combination":
                 return (this.perms.length * this.perms.length) - this.perms.length;
         }
-    }
+    },
+    total: function(){
+        return (this.lines * this.stake).toFixed(2);
+    },
+
 },
     methods:{
     disabled(UID, position)
@@ -285,16 +352,6 @@ export default {
     toggleperms: function( meetingUID, raceUID, runnerUID )
     {
         this.$store.commit('SET_EXACTAPERMS', this.perms);
-    },
-    togglebets: function( meetingUID, raceUID, runnerUID )
-    {     
-      let arr =[];
-        if(this.first && this.second)
-            console.log("Place Bet")
-        else
-            console.log("Skip")
-
-      //this.$store.commit('SET_PLACEBETS', arr)
     },
     created(){
     this.UID = this.$route.params.UID;
