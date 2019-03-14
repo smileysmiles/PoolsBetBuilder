@@ -6,6 +6,7 @@ import races from  './modules/Races';
 import runners from  './modules/Runners';
 import rp from  './modules/RacingPost';
 import betslip from  './modules/Bets';
+import placepotviewmodel from  './modules/PlacePotViewModel';
 
 Vue.use(Vuex);
 
@@ -15,7 +16,8 @@ export const store = new Vuex.Store({
         races,
         runners,
         rp,
-        betslip
+        betslip,
+        placepotviewmodel
     }
     // state:{
     //     Racecard: undefined,

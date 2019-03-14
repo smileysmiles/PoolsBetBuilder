@@ -11,7 +11,7 @@
          <v-divider></v-divider>
         </v-flex>
       </v-layout> 
-      <v-layout row wrap>
+      <v-layout row wrap v-if="racecard != undefined">
         <v-flex xs12 md12  v-for="meeting in racecard.Meetings" :key="meeting.number" flat>
             <v-layout row wrap  align-center justify-space-around v-if="meetingvisible(meeting)" mx-2 my-1>
                 <v-flex xs12 md3 mt-2 mb-1>
@@ -26,7 +26,7 @@
                     :color="getpoolscolor(pool.Name)" 
                     class="text-none" 
                     flat small 
-                    :to="getlink(pool.Name)"
+                    :to="getmeetingpoolslink(pool.Name, meeting.MeetingUID)"
                     >
                     <b>tote</b>{{pool.Name.toLowerCase()}}
                   </v-btn>
@@ -57,7 +57,7 @@ export default {
   name: 'home',
   computed: {
     racecard: function () {
-        return this.$store.getters.racecard;
+        return this.$store.getters.todaysracecard;
       }
   },
   methods:{
@@ -113,6 +113,10 @@ export default {
     {
       return "/race/" + raceUID;
     },
+    getmeetingpoolslink(pool, meetingUID)
+    {
+      return "/" + pool + "/" + meetingUID;
+    },
     getstatus(statusid)
     {
       switch (statusid){
@@ -134,7 +138,7 @@ export default {
 
 }
 </script>
-<style>
+<style scoped>
 li a {
     text-decoration: none;
     }

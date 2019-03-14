@@ -1,7 +1,6 @@
 <template>
       <v-container class="about" mt-5 pa-0>
-        
-            <v-tabs dark slider-color="white">
+            <v-tabs v-if="race != undefined"  dark slider-color="white">
                 <v-tab v-for="pool in race.Race.RacePools" :key="pool.Number" ripple dark>
                   {{ pool.Name }}
                 </v-tab>
@@ -9,7 +8,7 @@
                   
                   <v-card  v-if="pool.Name == 'Win'" flat mt-5>                   
                     <v-card-text>
-                      <winbetslip :Race=race></winbetslip>
+                      <winbetslip :Race=race :PoolID=pool.Number></winbetslip>
                     </v-card-text>
                   </v-card>
                 <v-card  v-if="pool.Name == 'Place'" flat>                   
@@ -19,11 +18,14 @@
                 </v-card>
                 <v-card  v-if="pool.Name == 'Exacta'" flat>                   
                   <v-card-text>
-                    <exactabetslip :Race=race></exactabetslip>
+                    <exactabetslip :Race=race :PoolID=pool.Number></exactabetslip>
                   </v-card-text>
                 </v-card>
                 </v-tab-item>
               </v-tabs>
+              <div>
+                Loading
+              </div>
 
 
    
@@ -46,11 +48,11 @@ export default {
     }
   },
   computed: {
-    races: function () {
-        return this.$store.getters.races;
+    todaysraces: function () {
+        return this.$store.getters.todaysraces;
       },   
     race: function(){
-      return this.races.Items.find( item => item.UID == this.$route.params.UID );
+      return this.todaysraces.find( item => item.UID == this.$route.params.UID );
     },
     
   },

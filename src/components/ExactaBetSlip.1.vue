@@ -14,6 +14,7 @@
                 <v-icon>add</v-icon>
             </v-btn>
         </v-fab-transition>
+
 <v-expansion-panel dark>   
     <v-expansion-panel-content>
         <v-layout slot="header" row wrap class="body-2">
@@ -199,13 +200,10 @@ export default {
             'PoolID'
             ],
     computed: {
-        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID', 'getracesbymeetingid' ]),
+        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID' ]),
         runners: function(){
             
         return  this.getRunnersByRaceUID(this.Race.UID);//this.allrunners.Items.filter( runner =>  runner.RaceUID == this.Race.UID  );
-        },
-        races: function(){
-            return  this.getracesbymeetingid(this.Race.MeetingUID);
         },
         allselections: function(){
             var selections = [];

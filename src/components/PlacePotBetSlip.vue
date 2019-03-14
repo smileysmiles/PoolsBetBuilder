@@ -14,6 +14,32 @@
                 <v-icon>add</v-icon>
             </v-btn>
         </v-fab-transition>
+
+<v-tabs dark slider-color="white">
+    <v-tab v-for="pool in race.Race" :key="pool.Number" ripple dark>
+        {{ pool.Name }}
+    </v-tab>
+    <v-tab-item v-for="pool in race.Race.RacePools" :key="'pool' + pool.Number">
+        
+        <v-card  v-if="pool.Name == 'Win'" flat mt-5>                   
+        <v-card-text>
+            <winbetslip :Race=race :PoolID=pool.Number></winbetslip>
+        </v-card-text>
+        </v-card>
+    <v-card  v-if="pool.Name == 'Place'" flat>                   
+        <v-card-text>
+        <placebetslip :Race=race></placebetslip>
+        </v-card-text>
+    </v-card>
+    <v-card  v-if="pool.Name == 'Exacta'" flat>                   
+        <v-card-text>
+        <exactabetslip :Race=race :PoolID=pool.Number></exactabetslip>
+        </v-card-text>
+    </v-card>
+    </v-tab-item>
+</v-tabs>
+
+
 <v-expansion-panel dark>   
     <v-expansion-panel-content>
         <v-layout slot="header" row wrap class="body-2">
@@ -199,7 +225,7 @@ export default {
             'PoolID'
             ],
     computed: {
-        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID', 'getracesbymeetingid' ]),
+        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID' ]),
         runners: function(){
             
         return  this.getRunnersByRaceUID(this.Race.UID);//this.allrunners.Items.filter( runner =>  runner.RaceUID == this.Race.UID  );
