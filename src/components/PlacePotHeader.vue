@@ -36,7 +36,7 @@
                 </v-expansion-panel-content>
             </v-expansion-panel>
  <v-expansion-panel>
-    <v-expansion-panel-content v-for="runner in race.Runners" :key="'runner' + runner.UID" >
+    <v-expansion-panel-content v-for="runner in runners(race.RaceUID)" :key="'runner' + runner.UID" >
             <v-layout slot="header" row wrap class="subheading fill-height align-center justify-space-around">
             <v-flex xs1 md1>
                 <span>{{runner.Number}}</span><!--<span v-if="runner.racingpostdata != undefined">({{runner.racingpostdata.start_number}})</span>-->
@@ -50,7 +50,7 @@
             </v-flex>
             <v-flex xs4  class="font-weight-bold">{{runner.Name}}</v-flex>
             <v-flex xs1>
-                <v-checkbox v-model="selections" :value="runner.UID" @click.native.stop>
+                <v-checkbox v-model="selections" :value="runner" @click.native.stop>
                 </v-checkbox>
             </v-flex>                   
             </v-layout>    
@@ -81,7 +81,14 @@ export default {
         }
     },
     computed: {
-        ...mapGetters([ 'selectedMeeting' ]),
+        ...mapGetters([ 'selectedMeeting', 'getRunnersByRaceUID' ]),
+    
     },
+    methods:{
+runners: function(uid){
+        
+    return  this.getRunnersByRaceUID(uid);
+    },
+    }
 }
 </script>

@@ -2,45 +2,12 @@
   <v-app>
     <div id="app">
       <Navbar></Navbar>     
-        <v-content v-if="loaded">
+        <v-content >
            <v-container fluid pa-2>
             <router-view></router-view>
            </v-container>
         </v-content>
-        <v-content v-else>
-          <div class="text-xs-center">
-            <v-progress-circular
-              :size="50"
-              color="primary"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :width="3"
-              color="red"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :size="70"
-              :width="7"
-              color="purple"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :width="3"
-              color="green"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :size="50"
-              color="amber"
-              indeterminate
-            ></v-progress-circular>
-          </div>
-        </v-content>
+        
          
       <Footer></Footer>
     </div>
@@ -64,11 +31,10 @@
         right:null
       }
     },
-    async created(){
-      await this.$store.dispatch('inittodaysracing').then(() => {
-        console.log("Success");
-        this.loaded = true;
-      });
-    }
+  async created () {
+    this.$store.dispatch('getTodaysRacecard');
+    this.$store.dispatch('getTodaysRaces');
+    this.$store.dispatch('getTodaysRunners');     
+  }
   }
 </script>

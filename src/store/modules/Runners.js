@@ -56,9 +56,7 @@ const getters ={
     todaysrunners: state => {
         return state.todaysrunners;
     },
-    getRunnersByRaceUID: (state) => (uid) => {
-        return state.todaysrunners.filter(todo => todo.RaceUID === uid)
-      },
+
     loading: state => {
         return state.loading;
     },

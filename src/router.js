@@ -5,11 +5,15 @@ import Home from './views/Home.vue'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  },
   routes: [
     {
-      path: '/',
+      path: '/home',
       name: 'home',
-      component: () => import(/* webpackChunkName: "about" */ './views/Today.vue')
+      component: () => import(/* webpackChunkName: "about" */ './views/Home.vue')
     },
     {
       path: '/Today',

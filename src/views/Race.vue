@@ -1,5 +1,7 @@
 <template>
+  <div>
       <v-container class="about" mt-5 pa-0>
+        HELLO
             <v-tabs v-if="race != undefined"  dark slider-color="white">
                 <v-tab v-for="pool in race.Race.RacePools" :key="pool.Number" ripple dark>
                   {{ pool.Name }}
@@ -30,17 +32,18 @@
 
    
   </v-container>
-  
+  </div>
 </template>
 <script>
 export default {
-  name: 'home',
+  name: 'Race',
   component:{
+
 
   },
   data() {
     return {
-      UID: 0,
+      UID: null,
       addcolor: "grey",
       activeBtn: 1,
       showNav: true,
@@ -50,7 +53,10 @@ export default {
   computed: {
     todaysraces: function () {
         return this.$store.getters.todaysraces;
-      },   
+      },
+    racerunners: function () {
+        return this.$store.getters.getRunnersByRaceUID(this.UID);
+      },  
     race: function(){
       return this.todaysraces.find( item => item.UID == this.$route.params.UID );
     },

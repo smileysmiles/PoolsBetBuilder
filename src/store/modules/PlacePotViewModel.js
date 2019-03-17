@@ -57,32 +57,41 @@ const getters = {
     //     else
     //         return null;
     // },
+
     todaysplacepotmeetings: ( state, getters ) => {
-        if (getters.todaysracecard != undefined)
+        if (getters.todaysracecard != null)
         {
-            console.log("here");
-            var nowtime = moment();
-            var meetings = [];
-            getters.todaysracecard.Meetings.filter(meeting => {
-                var pool = meeting.MeetingPools.find( pool => pool.Name == "Placepot");               
-                if (pool)
-                {
+            return getters.todaysracecard.Meetings;
+            // var date ='12-03-2019'
+            // var nowtime = moment();
+            // //ensure we have a copy
+            // let todaysracecard = JSON.parse(JSON.stringify(state.racecards.find( racecard => racecard.DataID == date)));
+            
+            // console.log("PP Racecard" + todaysracecard);
+
+            // var meetings = [];
+            // todaysracecard.Meetings.filter(meeting => {
+            //     var pool = meeting.MeetingPools.find( pool => pool.Name == "Placepot");               
+            //     if (pool)
+            //     {
+            //         let mymeetings = JSON.parse(JSON.stringify(m))
+            //         var race = meeting.Races.find( race => race.number === pool.FirstLeg );
+            //         var racetime = moment(race.ScheduledStart,"HH:mm");
+            //         console.log("PP RACE" + race);
+            //         if ( nowtime.isBefore( racetime ))
+            //         {
+            //             let index = meeting.Races.indexOf(race);
+            //             var ppraces =  meeting.Races.slice(index, 6).sort((a, b) => (b.number - a.number) );
+            //             meeting.Races=ppraces
+            //             meetings.push(meeting);
+            //         } 
                     
-                    var race = meeting.Races.find( race => race.number === pool.FirstLeg );
-                    var racetime = moment(race.ScheduledStart,"HH:mm");
-                    console.log(race);
-                    if ( nowtime.isBefore( racetime ))
-                    {
-                        let index = meeting.Races.indexOf(race);
-                        meeting.Races =  meeting.Races.slice(index, 6).sort((a, b) => (a.number > b.number) ? 1 : -1);
-                        console.log(meeting);
-                        meetings.push(meeting);
-                    }                   
-                } 
+                    
+            //     } 
                 
-            });
-            console.log("end placepot meetings" + JSON.stringify(meetings));
-            return meetings;
+            // });
+            // console.log("end placepot meetings" + JSON.stringify(meetings));
+            // return meetings;
         }
         return [];
     }

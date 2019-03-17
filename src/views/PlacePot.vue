@@ -2,7 +2,7 @@
     <v-container mt-5 pa-0>
         <div v-if="loaded">
             <meetingheader></meetingheader>
-            <placepotheader></placepotheader>
+            <placepotheader v-if="selectedMeeting != undefined"></placepotheader>
         </div>
         <p v-else>Loading</p>
     </v-container>
@@ -20,7 +20,10 @@ import { mapGetters, mapActions } from 'vuex'
             }
         },
         computed:{
-            ...mapGetters([ 'todaysplacepotmeetings', 'dataloaded', 'selectedMeeting' ]),
+            ...mapGetters([ 'todaysplacepotmeetings', 'selectedMeeting', 'getMeetingByUID' ]),
+            mymeeting(){
+                return this.getMeetingByUID( this.selectedmeetinguid);
+            }
         },
         created(){
             this.selectedmeetinguid = this.$route.params.UID;
