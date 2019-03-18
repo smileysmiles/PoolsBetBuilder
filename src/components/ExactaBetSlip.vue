@@ -74,12 +74,12 @@
     >
             <v-layout slot="header" row wrap class="subheading fill-height align-center justify-space-around">
             <v-flex xs1 md1>
-                <span>{{runner.racingpostdata.start_number}}</span><span>{{runner.racingpostdata.start_number}}</span>
+                <span>{{runner.Number}}</span>
             </v-flex>
             <v-flex xs1 md1>
                 <v-avatar size="25" tile>
                 
-                <img v-if="runner.racingpostdata != null" :src="runner.racingpostdata.silk_image_png" />
+                <img v-if="runner.racingpostdata != null" :src="runner.racingpostdata.silk_image_png" onerror="this.src='https://assets.ladbrokes.com/medias/racing_post/silk/159790.gif'" />
                 <img v-else src="https://assets.ladbrokes.com/medias/racing_post/silk/159790.gif" />
                 </v-avatar>
             </v-flex>

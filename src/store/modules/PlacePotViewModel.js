@@ -2,6 +2,7 @@ import moment from 'moment'
 
 const state = {
     selectedmeeting: null,
+    selectedrace: null,
     selections: [],
     placepotmeetings: []
 };
@@ -10,17 +11,9 @@ const mutations = {
     SET_SELECTEDMEETING: ( state, meeting ) => {
         state.selectedmeeting = meeting;
     },
-    ADD_SELECTION: ( state, selection ) => {
-        var record = state.selections.find( element => element.meetinguid == selection.meetinguid )
-        if (record)
-        {
-            state.selections.splice(state.selections.indexOf(record), 1, selection);
-        }
-        else
-        {
-            state.selections.push(selection);
-        }
-    }
+    SET_SELECTEDRACE: ( state, race ) => {
+        state.selectedrace = race;
+    },
 };
 
 const actions = {  
@@ -37,8 +30,18 @@ const actions = {
             resolve();
             });       
     },
-    AddSelections:({commit}, selection) => {
-        commit('ADD_SELECTION', meeting)
+    InitSelectedRace:({commit, getters}, uid) => {
+            var race = getters.racebyuid( uid );
+            console.log("Race" + race)
+            if (race != undefined)
+            {
+                commit('SET_SELECTEDRACE', race);
+                var meeting = getters.getMeetingByUID( race.MeetingUID);
+                if (meeting != undefined)
+                {
+                    commit('SET_SELECTEDMEETING', meeting)
+                }
+            }
     },
 };
 
@@ -46,52 +49,36 @@ const getters = {
     selectedMeeting: state => {
         return state.selectedmeeting;
     },
-    // selectedRaces: ( state, getters) => {
-    //     if (getters.selectedMeeting != undefined)
-    //     {
-    //         var pool = getters.selectedMeeting.MeetingPools.find( pool => pool.Name == "Placepot");
-    //         var index = getters.selectedMeeting.Races.findIndex( race => race.number === pool.FirstLeg );           
-    //         var items =  getters.selectedMeeting.Races.slice(index, 6).sort((a, b) => (a.number > b.number) ? 1 : -1);
-    //         return items;
-    //     }
-    //     else
-    //         return null;
-    // },
+    selectedRace: state => {
+        return state.selectedrace;
+    },
+    selectedMeetingRaces: (state, getters) =>{
+        if ( state.selectedMeeting === undefined)
+            return undefined;
+        return getters.racesbymeetinguid( state.selectedMeeting.MeetingUID );
+    },
 
     todaysplacepotmeetings: ( state, getters ) => {
         if (getters.todaysracecard != null)
         {
-            return getters.todaysracecard.Meetings;
-            // var date ='12-03-2019'
-            // var nowtime = moment();
-            // //ensure we have a copy
-            // let todaysracecard = JSON.parse(JSON.stringify(state.racecards.find( racecard => racecard.DataID == date)));
-            
-            // console.log("PP Racecard" + todaysracecard);
-
-            // var meetings = [];
-            // todaysracecard.Meetings.filter(meeting => {
-            //     var pool = meeting.MeetingPools.find( pool => pool.Name == "Placepot");               
-            //     if (pool)
-            //     {
-            //         let mymeetings = JSON.parse(JSON.stringify(m))
-            //         var race = meeting.Races.find( race => race.number === pool.FirstLeg );
-            //         var racetime = moment(race.ScheduledStart,"HH:mm");
-            //         console.log("PP RACE" + race);
-            //         if ( nowtime.isBefore( racetime ))
-            //         {
-            //             let index = meeting.Races.indexOf(race);
-            //             var ppraces =  meeting.Races.slice(index, 6).sort((a, b) => (b.number - a.number) );
-            //             meeting.Races=ppraces
-            //             meetings.push(meeting);
-            //         } 
-                    
-                    
-            //     } 
+            var meetings = JSON.parse(JSON.stringify( getters.todaysracecard.Meetings )) ;
+            return meetings.filter(meeting => {
+                 var pool = meeting.MeetingPools.find( pool => pool.Name == "Placepot");               
+                 if (pool)
+                 {
+                     var race = meeting.Races.find( race => race.number === pool.FirstLeg );
+                     var racetime = moment(race.ScheduledStart,"HH:mm");
+                     console.log("PP RACE" + race);
+                     if ( moment().isBefore( racetime ))
+                     {
+                         let index = meeting.Races.indexOf(race);
+                         var ppraces =  meeting.Races.slice(index, 6).sort((a, b) => (a.number - b.number) );
+                         meeting.Races=ppraces
+                         return meeting;
+                     } 
+                 } 
                 
-            // });
-            // console.log("end placepot meetings" + JSON.stringify(meetings));
-            // return meetings;
+             });
         }
         return [];
     }

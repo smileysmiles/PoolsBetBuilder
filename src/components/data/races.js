@@ -286,6 +286,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -537,6 +541,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -1513,6 +1521,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -1681,6 +1693,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -2004,6 +2020,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -2454,6 +2474,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [
@@ -2659,6 +2683,10 @@ export default
             {
               "Name": "Swinger",
               "Number": 5
+            },
+            {
+                "Name": "Quinella",
+                "Number": 6
             }
           ],
           "Runners": [

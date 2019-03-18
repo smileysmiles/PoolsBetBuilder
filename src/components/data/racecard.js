@@ -178,6 +178,12 @@ export default{
               "Number": 3,
               "FirstLeg": 3,
               "NumberOfLegs": 4
+            },
+            {
+              "Name": "Quinella",
+              "Number": 4,
+              "FirstLeg": 3,
+              "NumberOfLegs": 5
             }
           ],
           "RacecardUID": "8d97ef3c-4321-4db9-9a62-863300be31b5",

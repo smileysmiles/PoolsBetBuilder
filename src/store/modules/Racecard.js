@@ -108,6 +108,13 @@ const getters ={
     todaysraces: state => {
       return state.races;
     },
+    racesbymeetinguid: state => (uid) => {
+        var races = state.races.filter( race => { race.MeetingUID == uid})
+        return races.sort((a, b) => (a.number > b.number) ? 1 : -1)
+    },
+    racebyuid: state => (uid) => {
+        return state.races.find( race =>  race.UID == uid);
+    },
     todaysracecard: state => {
         var date ='12-03-2019'
         return state.racecards.find( racecard => racecard.DataID == date);
@@ -115,9 +122,9 @@ const getters ={
     getRunnersByRaceUID: (state) => (uid) => {
         var runners =  state.runners.filter(todo => todo.RaceUID === uid);
         return runners.sort((a, b) => a.Number - b.Number) ;
-      },
-      getMeetingByUID: (state, getters) => (uid) => {
-        var meeting =  getters.todaysracecard.filter(meeting => meeting.MeetingUID === uid);
+    },
+    getMeetingByUID: (state, getters) => (uid) => {
+        var meeting =  getters.todaysracecard.Meetings.filter(meeting => meeting.MeetingUID === uid);
         return meeting ;
       },
     

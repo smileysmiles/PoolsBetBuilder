@@ -1,7 +1,7 @@
 <template>
   <div>
+    <raceheader v-if="race != undefined"  :raceuid="UID"></raceheader>
       <v-container class="about" mt-5 pa-0>
-        HELLO
             <v-tabs v-if="race != undefined"  dark slider-color="white">
                 <v-tab v-for="pool in race.Race.RacePools" :key="pool.Number" ripple dark>
                   {{ pool.Name }}
@@ -23,9 +23,25 @@
                     <exactabetslip :Race=race :PoolID=pool.Number></exactabetslip>
                   </v-card-text>
                 </v-card>
+                <v-card  v-if="pool.Name == 'Trifecta'" flat>                   
+                  <v-card-text>
+                    TRIFECTA
+                  </v-card-text>
+                </v-card>
+                <v-card  v-if="pool.Name == 'Swinger'" flat>                   
+                  <v-card-text>
+                    Swinger
+                  </v-card-text>
+                </v-card>
+                <v-card  v-if="pool.Name == 'Quinella'" flat>                   
+                  <v-card-text>
+                    <quinellabetslip :Race=race :PoolID=pool.Number></quinellabetslip>    
+                  </v-card-text>
+                </v-card>
+                
                 </v-tab-item>
               </v-tabs>
-              <div>
+              <div v-else>
                 Loading
               </div>
 

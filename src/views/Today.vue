@@ -22,7 +22,7 @@
                   </div>
                 </v-flex>               
                 <v-spacer></v-spacer>
-                <div v-for="pool in meeting.MeetingPools" :key="pool.Number + '_' + pool.Number">
+                <div v-for="pool in meeting.MeetingPools" :key="meeting.number + '_pool_' + pool.Number">
                 <v-flex xs6 md2  class="text-xs-right" v-if="poolactive(pool, meeting)">
                   <v-btn 
                     :color="getpoolscolor(pool.Name)" 
