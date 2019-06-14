@@ -64,7 +64,7 @@
             </v-layout>              
         </v-flex>                     
     </v-layout>
-     <v-card>
+     <v-card v-if="racingpostdata">
         <v-card-text class="grey lighten-3"><div class="pa-2">{{runner.racingpostdata.spotlight}}</div>
 
         <v-layout  slot="header" row wrap class="body-2" pa-2>
@@ -96,7 +96,14 @@
         </v-layout>
         </v-card-text>
       </v-card>                               
+        <v-card v-else>
+            <v-card-text class="grey lighten-3"><div class="pa-2">Unfortunately no racing post data has been found. Please be assured we are looking into this.</div>                 
+            </v-card-text>
+        </v-card>
                 </v-expansion-panel-content>
+      
+  
+  
   </v-expansion-panel>
 
 
@@ -189,13 +196,14 @@ export default {
                 mintotalstake: value => value >= 2 || "Minimum Total Stake is £2.00",
                 maxtotalstake: value => value <= 100000 || "Maximum Total Stake is £100,000"
             },
+            racingpostdata: undefined,
         }
     },
     props: [    
             'Race'
             ],
     computed: {
-    ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID', 'getracesbymeetingid' ]),
+    ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID' ]),
     runners: function(){
         return  this.getRunnersByRaceUID(this.Race.UID);
     },

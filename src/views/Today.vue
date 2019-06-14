@@ -1,57 +1,43 @@
 <template>
     <div>
-      <div v-if="racecards != undefined">
-      <v-container class="mt-1" grid-list-md pa-0>
-      <v-layout row wrap>
-        <v-flex xs12 md12>
-          <v-card flat class="" ma-1>
-            <v-card-title title>
-                <h5 class="headline mb-0 Grey--text text--lighten-2">Today's Racing</h5>
-            </v-card-title>
-          </v-card>
-         <v-divider></v-divider>
-        </v-flex>
-      </v-layout> 
-      <v-layout row wrap v-if="racecard != undefined">
-        <v-flex xs12 md12  v-for="meeting in racecard.Meetings" :key="meeting.number" flat >
-          <div v-if="meetingvisible(meeting)">
-            <v-layout row wrap  align-center justify-space-around  mx-2 my-1>
-                <v-flex xs12 md3 mt-2 mb-1>
-                  <div class="title mb-0 grey--text text--darken-2">
-                    {{meeting.Name}}
-                  </div>
-                </v-flex>               
-                <v-spacer></v-spacer>
-                <div v-for="pool in meeting.MeetingPools" :key="meeting.number + '_pool_' + pool.Number">
-                <v-flex xs6 md2  class="text-xs-right" v-if="poolactive(pool, meeting)">
-                  <v-btn 
-                    :color="getpoolscolor(pool.Name)" 
-                    class="text-none" 
-                    flat small 
-                    :to="getmeetingpoolslink(pool.Name, meeting.MeetingUID)"
-                    >
-                    <b>tote</b>{{pool.Name.toLowerCase()}}
-                  </v-btn>
-                </v-flex>
-                </div>
-              </v-layout>
+      <template v-if="racecard">
+        <v-container class="mt-1">
+          <v-layout row wrap justify-space-around>
+            <v-flex xs12 md5 v-for="meeting in racecard.Meetings" :key="meeting.number" class="mb-3">
+              <template v-if="meeting.MeetingStatus == actioncodes.on ">
+                  <v-card height="100%" flat class="rounded-card" outline>
+                    <v-card-title class="secondary pa-1">
+                      <v-btn round color="primary" class="text-none" flat :to="MeetingURI(meeting.Name)">
+                        <h3>{{meeting.Name}}</h3> 
+                      </v-btn>  
+                    </v-card-title>
+                    <v-card-text class="grow">
+                    <v-layout row wrap align-space-around justify-space-around fill-height="true">
+                      <div v-for="pool in meeting.MeetingPools" :key="meeting.number + '_pool_' + pool.Number">
+                        <v-flex xs3 md2  class="text-xs-right" >
+                          <v-btn :color="getpoolscolor(pool.Name)" :disabled="poolactive(pool, meeting)" class="text-none" outline flat :to="MultiLegPoolLink(meeting.Name, pool.Name)" round>
+                            <b>tote</b>{{pool.Name.toLowerCase()}}
+                          </v-btn>
+                        </v-flex>
+                      </div>
+                    </v-layout>
+                    </v-card-text>
+                      <v-layout row wrap align-end justify-space-around>
+                          <v-flex xs4 md3 align-content-center v-for="myrace in meeting.Races" :key="myrace.number" class="text-xs-center">
+                              <v-btn :color="getcolor(myrace.Status)" class="body2" fab flat small v-ripple :to="getlink(myrace.RaceUID)">{{myrace.ScheduledTime}}
+                              </v-btn>
+                          </v-flex>
+                      </v-layout>
 
-              <v-layout row wrap align-center justify-space-left>
-                <div v-for="myrace in meeting.Races" :key="myrace.number">
-                  <v-flex xs3 md1 v-if="myrace.RacePoolsCount != 0">
-                      <v-btn :color="getcolor(myrace.ScheduledStart)" class="body2" fab flat small v-ripple :to="getlink(myrace.RaceUID)">{{myrace.ScheduledStart}}
-                      </v-btn>
-                  </v-flex>
-                </div>
-              </v-layout>
-          
-          <v-divider></v-divider>
-          </div>
-        </v-flex>
-        
-      </v-layout>
-      </v-container>
-      </div>
+                      </v-card>
+                      </template>
+                    </v-flex>               
+                    
+                  </v-layout>
+              
+
+        </v-container>
+      </template>
       <v-content v-else>
           <div class="text-xs-center">
             <v-progress-circular
@@ -90,29 +76,35 @@
 </template>
 <script>
 import moment from 'moment';
+import { mapGetters, mapActions } from 'vuex'
+import { ActionCodes } from '../store/constants'
 
 export default {
-  name: 'home',
+  name: 'Today',
   computed: {
-    racecards: function () {
-      return this.$store.getters.getracecards;
-    },
+    ...mapGetters([ 'gettodaysracecard' ]),
     racecard: function () {
-        var date ='12-03-2019'
-        if (this.racecards != undefined)
-          return this.racecards.find( racecard => racecard.DataID == date);
-      }   
+        return this.gettodaysracecard;
+      },
+    actioncodes: function(){
+      return ActionCodes;
+    }
   },
   methods:{
-    racestatus(time)
+    racestatus(status)
     {
-      var racetime = moment(time,"HH:mm");
-      var nowtime = moment();
-
-      if ( nowtime.isSameOrAfter( racetime ))
-        return false;
-      else
+      if (status == this.actioncodes.on)
         return true;
+
+      return false;
+    },
+    MeetingURI(meeting)
+    {
+      return `Meeting/${meeting}`;
+    },
+    MultiLegPoolLink(meeting, pool)
+    {
+      return `Meeting/${meeting}`;
     },
     getpoolscolor(name)
     {
@@ -131,12 +123,11 @@ export default {
 
             }
     },
-    getcolor(time)
+    getcolor(status)
     {     
-      if (!this.racestatus(time))
+      if (!this.racestatus(status))
         return "red";
       else
-        // console.log (time + " ----- " + racetime.format("HH:MM") + "is not before " + nowtime.format("HH:MM") )
         return "green";
     },
     meetingvisible(meeting)
@@ -147,18 +138,22 @@ export default {
     },
     poolactive(pool, meeting)
     {
+      //1 Check pool status
+
+      if (pool.status != this.actioncodes.on)
+        return false;
+      
+      //2 Lets also lock out based on race status.
         let firstleg = pool.FirstLeg;
-        console.log(meeting)
-        console.log(pool)
-        let race = meeting.Races.find( race => race.number == firstleg);
+        let race = meeting.Races.find( race => race.Number == firstleg);
         
-        if (race != undefined)
-          return this.racestatus(race.ScheduledStart);
-        else
-          {
-            console.log("Race NOT FOUND!")
-            return false;
-          }
+        console.log(race.status)
+        if (race.status != this.actioncodes.on)
+          return false;
+
+      //3
+
+        return true
     },
     getlink(raceUID)
     {
@@ -185,6 +180,11 @@ export default {
 
     }
 
+  },
+    async created () {
+      this.course = this.$route.params.course
+      await this.$store.dispatch('getTodaysRacecard');
+      console.log("Data Loaded")
   }
 
 }
@@ -192,5 +192,9 @@ export default {
 <style scoped>
 li a {
     text-decoration: none;
-    }
+}
+
+.rounded-card{
+    border-radius:5px;
+}
 </style>

@@ -97,10 +97,14 @@
                 </v-checkbox>
             </v-flex>           
             </v-layout>    
-            <v-card pa-0>
-        <v-card-text class="grey lighten-3">{{runner.racingpostdata.spotlight}}</v-card-text>
-      </v-card>                               
-                </v-expansion-panel-content>
+            <v-card pa-0 v-if="racingpostdata">
+                <v-card-text class="grey lighten-3">{{runner.racingpostdata.spotlight}}</v-card-text>
+            </v-card>                        
+            <v-card pa-0 v-else>
+                <v-card-text class="grey lighten-3">Unfortunately no racing post data has been found. Please be assured we are looking into this.</v-card-text>
+            </v-card>                        
+                   
+        </v-expansion-panel-content>
   </v-expansion-panel>
         </div>
         <v-card dark class="headline">
@@ -191,7 +195,8 @@ export default {
                 minstake: value => value >= 0.1 || "Minimum bet is £0.10",
                 mintotalstake: value => value >= 2 || "Minimum Total Stake is £2.00",
                 maxtotalstake: value => value <= 100000 || "Maximum Total Stake is £100,000"
-            }
+            },
+            racingpostdata: undefined
         }
     },
     props: [    

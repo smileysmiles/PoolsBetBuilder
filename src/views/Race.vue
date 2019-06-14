@@ -2,43 +2,41 @@
   <div>
     <raceheader v-if="race != undefined"  :raceuid="UID"></raceheader>
       <v-container class="about" mt-5 pa-0>
-            <v-tabs v-if="race != undefined"  dark slider-color="white">
-                <v-tab v-for="pool in race.Race.RacePools" :key="pool.Number" ripple dark>
+            <v-tabs v-if="race != undefined" grow dark slider-color="white">
+                <v-tab v-for="pool in race.Race.RacePools" :key="pool.Number" ripple>
                   {{ pool.Name }}
                 </v-tab>
                 <v-tab-item v-for="pool in race.Race.RacePools" :key="'pool' + pool.Number">
-                  
                   <v-card  v-if="pool.Name == 'Win'" flat mt-5>                   
+                      <v-card-text>
+                        <winbetslip :Race=race :PoolID=pool.Number></winbetslip>
+                      </v-card-text>
+                    </v-card>
+                  <v-card  v-if="pool.Name == 'Place'" flat>                   
                     <v-card-text>
-                      <winbetslip :Race=race :PoolID=pool.Number></winbetslip>
+                      <placebetslip :Race=race></placebetslip>
                     </v-card-text>
                   </v-card>
-                <v-card  v-if="pool.Name == 'Place'" flat>                   
-                  <v-card-text>
-                    <placebetslip :Race=race></placebetslip>
-                  </v-card-text>
-                </v-card>
-                <v-card  v-if="pool.Name == 'Exacta'" flat>                   
-                  <v-card-text>
-                    <exactabetslip :Race=race :PoolID=pool.Number></exactabetslip>
-                  </v-card-text>
-                </v-card>
-                <v-card  v-if="pool.Name == 'Trifecta'" flat>                   
-                  <v-card-text>
-                    TRIFECTA
-                  </v-card-text>
-                </v-card>
-                <v-card  v-if="pool.Name == 'Swinger'" flat>                   
-                  <v-card-text>
-                    Swinger
-                  </v-card-text>
-                </v-card>
-                <v-card  v-if="pool.Name == 'Quinella'" flat>                   
-                  <v-card-text>
-                    <quinellabetslip :Race=race :PoolID=pool.Number></quinellabetslip>    
-                  </v-card-text>
-                </v-card>
-                
+                  <v-card  v-if="pool.Name == 'Exacta'" flat>                   
+                    <v-card-text>
+                      <exactabetslip :Race=race :PoolID=pool.Number></exactabetslip>
+                    </v-card-text>
+                  </v-card>
+                  <v-card  v-if="pool.Name == 'Trifecta'" flat>                   
+                    <v-card-text>
+                      TRIFECTA
+                    </v-card-text>
+                  </v-card>
+                  <v-card  v-if="pool.Name == 'Swinger'" flat>                   
+                    <v-card-text>
+                      Swinger
+                    </v-card-text>
+                  </v-card>
+                  <v-card  v-if="pool.Name == 'Quinella'" flat>                   
+                    <v-card-text>
+                      <quinellabetslip :Race=race :PoolID=pool.Number></quinellabetslip>    
+                    </v-card-text>
+                  </v-card>                
                 </v-tab-item>
               </v-tabs>
               <div v-else>
@@ -46,11 +44,14 @@
               </div>
 
 
-   
+  
   </v-container>
   </div>
 </template>
 <script>
+import { mapGetters } from 'vuex'
+import moment from "moment"
+
 export default {
   name: 'Race',
   component:{
@@ -67,14 +68,12 @@ export default {
     }
   },
   computed: {
-    todaysraces: function () {
-        return this.$store.getters.todaysraces;
-      },
+    ...mapGetters([ 'todaysraces', 'getRunnersByRaceUID' ]),
     racerunners: function () {
-        return this.$store.getters.getRunnersByRaceUID(this.UID);
+        return this.getRunnersByRaceUID(this.UID);
       },  
     race: function(){
-      return this.todaysraces.find( item => item.UID == this.$route.params.UID );
+      return this.todaysraces.find( item => item.UID == this.UID );
     },
     
   },
@@ -82,7 +81,8 @@ export default {
     
   },
     created(){
-    this.UID = this.$route.params.UID;   
+    this.UID = this.$route.params.UID;
+    //this.$store.dispatch('loadRacingpostRunners', this.UID );
   }
 }
 </script>

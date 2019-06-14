@@ -7,7 +7,7 @@
           </div>
           <div class="card-body">
               <div class="messages" v-for="(msg, index) in messages" :key="index">
-                  <p><span class="font-weight-bold">{{ msg }}: </span>{{ msg }}</p>
+                  <p><span class="font-weight-bold">{{ msg.messagetype }}: </span>{{ msg }}</p>
               </div>
           </div>
       </div>
@@ -40,7 +40,7 @@ export default {
                 timeout: 5e3,
                 maxAttempts: 10,
                 onopen: e => console.log('Connected!', e),
-                onmessage: e => this.messages.push(e.data),
+                onmessage: e => this.recievedMessage(e.data),
                 onreconnect: e => console.log('Reconnecting...', e),
                 onmaximum: e => console.log('Stop Attempting!', e),
                 onclose: e => console.log('Closed!', e),
@@ -51,6 +51,10 @@ export default {
     methods: {
         sendMessage(){
             this.ws.json({action:"sendMessage", data: "Hello"});
+        },
+        recievedMessage(json){
+            let messages = JSON.parse(json);
+            this.messages.push(...messages)
         }
     },
     mounted() {

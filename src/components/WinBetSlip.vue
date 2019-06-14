@@ -1,6 +1,8 @@
 <template>
-    <div>
-        <v-expansion-panel dark>   
+    <div  class="text-xs-center">
+
+    <div v-if="runners.length > 0">
+    <v-expansion-panel dark>   
     <v-expansion-panel-content>
         <v-layout slot="header" row wrap class="body-2">
             BET OPTIONS
@@ -14,6 +16,7 @@
         </v-card>    
         
     </v-expansion-panel-content>
+
 </v-expansion-panel>
     <v-expansion-panel>
     <v-expansion-panel-content>
@@ -21,14 +24,20 @@
         <v-flex xs12 md12 >
             <v-layout row wrap class="caption fill-height align-center justify-space-around">
                 <v-flex xs1 md1>
-                    <span class="grey--text text--lighten-1">No.</span>
+                    <span class="grey--text">No.</span>
                 </v-flex>
                 <v-flex xs2 md1 >
-                    <span class="grey--text text--lighten-1">Silk</span>
+                    <span class="grey--text">Silk</span>
                 </v-flex>
-                <v-flex xs6><span class="grey--text text--lighten-1">Name</span></v-flex>
-                <v-flex xs3 pl-3>
-                    <span class="grey--text text--lighten-1">{{eachway == true ? "E/W" : "Win" }}</span>
+                
+                <v-flex xs6 md5><span class="grey--text">Name</span></v-flex>
+                <v-flex md1 class="hidden-sm-and-down">
+                    <span class="grey--text">Forecast</span>
+                </v-flex>
+                <v-flex xs3 md4>
+                    <div class="text-xs-center">
+                        <span class="grey--text">{{eachway == true ? "E/W" : "Win" }}</span>
+                    </div>
                 </v-flex>
             </v-layout>              
         </v-flex>                     
@@ -41,64 +50,37 @@
       </v-card>    
     </v-expansion-panel-content>
   </v-expansion-panel>
-    <v-expansion-panel>
-    <v-expansion-panel-content v-for="runner in runners" :key="'runner' + runner.Number">
-    <v-layout slot="header"  row wrap class="body-2">
-        <v-flex xs12 md12 >
-            <v-layout row wrap class="subheading fill-height align-center justify-space-around">
-            <v-flex xs1  md1>
-                <span>{{runner.Number}}</span>
-            </v-flex>
-            <v-flex xs2 md1>
-                <v-avatar size="25" tile>
-                
-                <img v-if="runner.racingpostdata != null" :src="runner.racingpostdata.silk_image_png" />
-                <img v-else src="https://assets.ladbrokes.com/medias/racing_post/silk/159790.gif" />
-                </v-avatar>
-            </v-flex>
-            <v-flex xs6  class="font-weight-bold">{{runner.Name}}</v-flex>
-            <v-flex xs2 pl-3>
-                <v-checkbox v-model="selections"  @click.native.stop  :value="runner.UID">
-                </v-checkbox>
-            </v-flex>
-            <v-flex xs1></v-flex>       
-            </v-layout>              
-        </v-flex>                     
-    </v-layout>
-     <v-card>
-        <v-card-text class="grey lighten-3"><div class="pa-2">{{runner.racingpostdata.spotlight}}</div>
-
-        <v-layout  slot="header" row wrap class="body-2" pa-2>
-            <v-flex xs12 md12 >
-                <v-layout row wrap class="caption fill-height align-left ">
-                    <v-flex xs3 md2 class="text-md-right" py-2>
-                        <span class="grey--text text--lighten-1">Jockey :</span>
+    <v-expansion-panel light focusable>
+        <v-expansion-panel-content v-for="runner in runners" :key="'runner' + runner.Number">
+            <v-layout slot="header"  row wrap class="body-2">
+                <v-flex xs12 md12 >
+                    <v-layout row wrap class="subheading fill-height align-center justify-space-around">
+                    <v-flex xs1  md1>
+                        <span>{{runner.Number}}</span>
                     </v-flex>
-                    <v-flex xs3  md2 class="text-md-left" py-2>
-                        <span class="grey--text text--darken-3 text-md-center">{{runner.racingpostdata.jockey_name}}</span>
-                    </v-flex>
-                    <v-flex xs3  md2 class="text-md-right" py-2>
-                        <span class="grey--text text--lighten-1">Trainer :</span>
-                    </v-flex>
-                    <v-flex xs3  md2 class="text-md-left" py-2>
-                        <span class="grey--text text--darken-3">{{runner.racingpostdata.trainer_stylename}}</span>
+                    <v-flex xs2 md1>
+                        <v-avatar size="25" tile>
+                            <img v-if="runner.racingpostdata != null" :src="runner.racingpostdata.silk_image_png" />
+                            <img v-else src="https://assets.ladbrokes.com/medias/racing_post/silk/159790.gif" />
+                        </v-avatar>
                     </v-flex>
                     
-                    <v-flex xs3 md2 class="text-md-right" py-2><span class="grey--text text--lighten-1">Owner :</span></v-flex>
-                    <v-flex xs3 md2 class="text-md-left" py-2><span class="black--text text--darken-3">{{runner.racingpostdata.owner_name}}</span></v-flex>
-                       <v-flex xs3 md2 class="text-md-right" py-2>
-                        <span class="grey--text text--lighten-1">14 day form :</span>
-                    </v-flex >
-                    <v-flex xs3 md2 class="text-md-left" py-2>
-                        <span class="grey--text text--darken-3">{{runner.racingpostdata.jockey_last_14_days.wins}} wins in {{runner.racingpostdata.jockey_last_14_days.runs}} runs</span>
+                    
+                    <v-flex xs6 md5 class="font-weight-bold">{{runner.Name}}</v-flex>
+                    <v-flex md1 class="hidden-sm-and-down">
+                        <span class="font-weight-bold blue--text">{{runner.racingpostdata.forecast_odds_desc}}</span>
                     </v-flex>
-                </v-layout>              
-            </v-flex>                     
-        </v-layout>
-        </v-card-text>
-      </v-card>                               
-                </v-expansion-panel-content>
-  </v-expansion-panel>
+                    <v-flex xs3 md4>
+                        <v-checkbox  class="justify-center" v-model="selections"  @click.native.stop  :value="runner.UID">
+                        </v-checkbox>
+                    </v-flex>
+                    <v-flex xs1></v-flex>       
+                    </v-layout>              
+                </v-flex>                     
+            </v-layout>
+            <racingpostrunnerinfo :racingpostdata="runner.racingpostdata" ></racingpostrunnerinfo>           
+        </v-expansion-panel-content>
+    </v-expansion-panel>
 
 
             <v-card dark class="headline" flat>
@@ -172,9 +154,43 @@
             </template>
         </v-card>
 
+    </div>
+    <div v-else>
+          <div class="text-xs-center">
+            <v-progress-circular
+              :size="50"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
+
+            <v-progress-circular
+              :width="3"
+              color="red"
+              indeterminate
+            ></v-progress-circular>
+
+            <v-progress-circular
+              :size="70"
+              :width="7"
+              color="purple"
+              indeterminate
+            ></v-progress-circular>
+
+            <v-progress-circular
+              :width="3"
+              color="green"
+              indeterminate
+            ></v-progress-circular>
+
+            <v-progress-circular
+              :size="50"
+              color="amber"
+              indeterminate
+            ></v-progress-circular>
+          </div>
+        </div>
 
     </div>
-    
 </template>
 <script>
 
@@ -193,17 +209,16 @@ export default {
                 maxtotalstake: value => value <= 100000 || "Maximum Total Stake is £100,000"
             },
             eachway:false,
-            sheet:false
         }
     },
     props: [    
             'Race'
             ],
     computed: {
-        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID', 'getracesbymeetingid' ]),
+        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID' ]),
     runners: function(){
-        
-    return  this.getRunnersByRaceUID(this.Race.UID);
+
+        return  this.getRunnersByRaceUID(this.Race.UID);
     },
     validbet: function(){
         return this.selections.length >=1 ? true : false;
@@ -234,8 +249,7 @@ export default {
     
   },
     created(){
-    this.UID = this.$route.params.UID;   
-    //this.selectedwinners = this.winbets.filter(item => item.race == this.UID).map(bet => bet.runner);
+    this.UID = this.$route.params.UID;
   }
 }
 </script>

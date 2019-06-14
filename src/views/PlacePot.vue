@@ -20,9 +20,9 @@ import { mapGetters, mapActions } from 'vuex'
             }
         },
         computed:{
-            ...mapGetters([ 'todaysplacepotmeetings', 'selectedMeeting', 'getMeetingByUID' ]),
+            ...mapGetters([ 'todayspoolmeetings', 'selectedMeeting' ]),
             mymeeting(){
-                return this.getMeetingByUID( this.selectedmeetinguid);
+                return this.selectedMeeting;
             }
         },
         created(){
@@ -37,8 +37,9 @@ import { mapGetters, mapActions } from 'vuex'
             }
             else
             {
-                this.$store.dispatch('SetSelectedMeeting', this.todaysplacepotmeetings[0]).then(() => {
+                this.$store.dispatch('SetSelectedMeeting', this.todayspoolmeetings("Placepot")[0]).then(() => {
                     console.log("Success2");
+                    
                     this.loaded = true;
                 });
             }

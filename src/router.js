@@ -11,17 +11,14 @@ export default new Router({
   },
   routes: [
     {
-      path: '/home',
-      name: 'home',
-      component: () => import(/* webpackChunkName: "about" */ './views/Home.vue')
+      path: '/',
+      name: 'Todays Racing',
+      component: () => import(/* webpackChunkName: "about" */ './views/Today.vue')
     },
     {
-      path: '/Today',
-      name: 'today',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Today.vue')
+      path: '/Meeting/:course',
+      name: 'Events',
+      component: () => import(/* webpackChunkName: "about" */ './views/Event.1.vue')
     },
     {
       path: '/Meeting',
@@ -34,28 +31,29 @@ export default new Router({
     {
       path: '/race/:UID',
       name: 'Race',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/Race.vue')
+      component: () => import('./views/Race.vue')
+    },
+    {
+      path: '/multileg/:UID',
+      name: 'Race',
+      component: () => import('./views/Race.vue')
     },
     {
       path: '/chat/',
       name: 'Chat',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/chat.vue')
+      component: () => import('./views/chat.vue')
     },
     {
       path: '/Placepot/:UID',
       name: 'Placepot',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
       component: () => import('./views/PlacePot.vue')
     }
-
+    ,
+    {
+      path: '/architecturetimeline',
+      name: 'Timeline',
+      component: () => import('./views/ArchitectureTimeline.vue')
+    }
   ]
 })
 

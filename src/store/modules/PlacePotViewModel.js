@@ -1,47 +1,63 @@
 import moment from 'moment'
 
+//poolid = poolidentifier + "_" Leg
+//placepotselections = { poolid, selections }
+
 const state = {
-    selectedmeeting: null,
-    selectedrace: null,
-    selections: [],
-    placepotmeetings: []
+    placepotselections:[],
+    pooluid: null,
+    leg1selections:[]
 };
 
 const mutations = {
-    SET_SELECTEDMEETING: ( state, meeting ) => {
-        state.selectedmeeting = meeting;
+    'ADD_TO_SELECTIONS' ( state, selection ) {
+        //find PoolID
+        let exists = state.placepotselections.find( bet => bet.poolid == selection.poolid );
+        if (!exists)
+        {
+            let output = [ { leg : selection.leg, selections: [ selection.selection ] } ];
+            
+            state.placepotselections.push( { poolid : selection.poolid, legs : output } );
+        }
+        else
+        {
+            console.log("Exists")
+
+            let poolleg = exists.legs.find( leg => leg.leg == selection.leg )
+
+            if (poolleg)
+                poolleg.selections.push( selection.selection );
+            else
+                {
+                    let output = { leg : selection.leg, selections: [ selection.selection ] };
+                    exists.legs.push( output )
+                }
+            
+        }       
     },
-    SET_SELECTEDRACE: ( state, race ) => {
-        state.selectedrace = race;
-    },
+    'REMOVE_FROM_SELECTIONS' ( state, selection ) {
+        //find PoolID
+        let exists = state.placepotselections.find( bet => bet.poolid == selection.poolid );
+        if (exists)
+        {
+            let poolleg = exists.legs.find( leg => leg.leg == selection.leg )
+
+            if (poolleg)
+                poolleg.selections = poolleg.selections.filter( item => item.UID != selection.selection.UID)
+        }
+ 
+    }
 };
 
 const actions = {  
-    SetSelectedMeeting: ({commit, getters}, meeting) => {
-        return new Promise((resolve, reject) => {
-            commit('SET_SELECTEDMEETING', meeting)
-            resolve();
-            });       
+    
+    ADD_SELECTION ({ commit}, selection){
+        if (state.poolid != selection.poolid)
+            commit('CLEAR_PLACEPOT')
+        commit('ADD_TO_BETLIP', selection) 
     },
-    InitSelectedMeeting:({commit, getters}, uid) => {
-        return new Promise((resolve, reject) => {
-            var meeting = getters.todaysplacepotmeetings.find( meeting => meeting.MeetingUID == uid );   
-            commit('SET_SELECTEDMEETING', meeting)
-            resolve();
-            });       
-    },
-    InitSelectedRace:({commit, getters}, uid) => {
-            var race = getters.racebyuid( uid );
-            console.log("Race" + race)
-            if (race != undefined)
-            {
-                commit('SET_SELECTEDRACE', race);
-                var meeting = getters.getMeetingByUID( race.MeetingUID);
-                if (meeting != undefined)
-                {
-                    commit('SET_SELECTEDMEETING', meeting)
-                }
-            }
+    REMOVE_SELECTION({commit}, selection){
+        commit('REMOVE_FROM_BETLIP', selection) 
     },
 };
 
@@ -49,38 +65,12 @@ const getters = {
     selectedMeeting: state => {
         return state.selectedmeeting;
     },
-    selectedRace: state => {
-        return state.selectedrace;
+    selections: state => {
+        return state.selections;
     },
-    selectedMeetingRaces: (state, getters) =>{
-        if ( state.selectedMeeting === undefined)
-            return undefined;
-        return getters.racesbymeetinguid( state.selectedMeeting.MeetingUID );
-    },
-
-    todaysplacepotmeetings: ( state, getters ) => {
-        if (getters.todaysracecard != null)
-        {
-            var meetings = JSON.parse(JSON.stringify( getters.todaysracecard.Meetings )) ;
-            return meetings.filter(meeting => {
-                 var pool = meeting.MeetingPools.find( pool => pool.Name == "Placepot");               
-                 if (pool)
-                 {
-                     var race = meeting.Races.find( race => race.number === pool.FirstLeg );
-                     var racetime = moment(race.ScheduledStart,"HH:mm");
-                     console.log("PP RACE" + race);
-                     if ( moment().isBefore( racetime ))
-                     {
-                         let index = meeting.Races.indexOf(race);
-                         var ppraces =  meeting.Races.slice(index, 6).sort((a, b) => (a.number - b.number) );
-                         meeting.Races=ppraces
-                         return meeting;
-                     } 
-                 } 
-                
-             });
-        }
-        return [];
+    getbetslip: state => pooluid => {
+        let betslip = state.betslip.find( bet => bet.poolid == pooluid );
+        return betslip;
     }
 
 };

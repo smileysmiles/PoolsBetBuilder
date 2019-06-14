@@ -11,8 +11,8 @@
                     <v-combobox
                     v-model="selectedMeeting"
                     :items="todaysplacepotmeetings"
-                    item-text="Name"
-                    item-value="MeetingUID"
+                    item-text="Meeting.Name"
+                    item-value="UID"
                     label="Placepot meeting"
                     return-object
                     ></v-combobox>
@@ -37,7 +37,10 @@ export default {
       }
     },
     computed:{
-        ...mapGetters([ 'todaysplacepotmeetings' ]),
+        ...mapGetters([ 'todayspoolmeetings' ]),
+        todaysplacepotmeetings: function (){
+            return this.todayspoolmeetings("Placepot");
+        },
         selectedMeeting:{
             get(){
                 return this.$store.getters.selectedMeeting;

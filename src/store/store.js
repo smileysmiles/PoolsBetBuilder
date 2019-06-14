@@ -2,16 +2,18 @@ import Vue from 'vue';
 import Vuex from 'vuex'
 import axios from 'axios';
 import racecard from './modules/Racecard';
-import runners from  './modules/Runners';
 import placepotviewmodel from  './modules/PlacePotViewModel';
+import racepools from  './modules/RacePools';
+import runners from  './modules/Runners';
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
     modules:{
         racecard,
-        runners,
-        placepotviewmodel
+        placepotviewmodel,
+        racepools,
+        runners
     }
     // state:{
     //     Racecard: undefined,
