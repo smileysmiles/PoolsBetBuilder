@@ -1,14 +1,14 @@
 <template>
     <div>
       <template v-if="racecard">
-        <v-container class="mt-1">
+        <v-container class="ma-0">
           <v-layout row wrap justify-space-around>
             <v-flex xs12 md5 v-for="meeting in racecard.Meetings" :key="meeting.number" class="mb-3">
               <template v-if="meeting.MeetingStatus == actioncodes.on ">
-                  <v-card height="100%" flat class="rounded-card" outline>
+                  <v-card flat  outline>
                     <v-card-title class="secondary pa-1">
                       <v-btn round color="primary" class="text-none" flat :to="MeetingURI(meeting.Name)">
-                        <h3>{{meeting.Name}}</h3> 
+                        <h3 class="white--text">{{meeting.Name}}</h3> 
                       </v-btn>  
                     </v-card-title>
                     <v-card-text class="grow">
@@ -24,7 +24,7 @@
                     </v-card-text>
                       <v-layout row wrap align-end justify-space-around>
                           <v-flex xs4 md3 align-content-center v-for="myrace in meeting.Races" :key="myrace.number" class="text-xs-center">
-                              <v-btn :color="getcolor(myrace.Status)" class="body2" fab flat small v-ripple :to="getlink(myrace.RaceUID)">{{myrace.ScheduledTime}}
+                              <v-btn :color="getcolor(myrace.Status)" class="body2" fab flat small v-ripple :to="getlink(meeting.Name)">{{myrace.ScheduledTime}}
                               </v-btn>
                           </v-flex>
                       </v-layout>
@@ -39,38 +39,7 @@
         </v-container>
       </template>
       <v-content v-else>
-          <div class="text-xs-center">
-            <v-progress-circular
-              :size="50"
-              color="primary"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :width="3"
-              color="red"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :size="70"
-              :width="7"
-              color="purple"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :width="3"
-              color="green"
-              indeterminate
-            ></v-progress-circular>
-
-            <v-progress-circular
-              :size="50"
-              color="amber"
-              indeterminate
-            ></v-progress-circular>
-          </div>
+          
         </v-content>
     </div>
 </template>
@@ -155,9 +124,9 @@ export default {
 
         return true
     },
-    getlink(raceUID)
+    getlink(meetingUID)
     {
-      return "/race/" + raceUID;
+      return "/races/" + meetingUID;
     },
     getmeetingpoolslink(pool, meetingUID)
     {
@@ -189,12 +158,16 @@ export default {
 
 }
 </script>
-<style scoped>
+<style>
 li a {
     text-decoration: none;
 }
 
 .rounded-card{
     border-radius:5px;
+}
+
+.container{
+  padding: 0px
 }
 </style>

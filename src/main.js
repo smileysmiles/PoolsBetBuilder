@@ -20,6 +20,11 @@ import RunnerSilksInfo from './components/RunnerSilksInfo.vue'
 import PlacePotRace from './components/PlacePotRace.vue'
 import PlacePotSelection from './components/PlacePotSelection.vue'
 import PlacePot from './components/PlacePot.vue'
+import PlacePotBetSlip from './components/PlacePotBetSlip.vue'
+
+import Race from './views/Race.vue'
+
+import Loading from './components/Loading.vue'
 
 import Chat from './views/chat.vue'
 import Vue from 'vue'
@@ -32,6 +37,7 @@ Vue.config.productionTip = false
 //import 'vuetify/src/stylus/app.styl'
 
 
+Vue.component('race', Race )
 
 Vue.component('winbetslip', WinBetSlip )
 Vue.component('placebetslip', PlaceBetSlip )
@@ -49,6 +55,8 @@ Vue.component('placepot', PlacePot )
 Vue.component('placepotheader', PlacePotHeader )
 Vue.component('placepotrunners', PlacePotRunners )
 Vue.component('placepotselection', PlacePotSelection )
+Vue.component('placepotbetslip', PlacePotBetSlip )
+Vue.component('loading', Loading )
 
 
 new Vue({

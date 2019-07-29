@@ -1,13 +1,13 @@
 <template>
     <div  class="text-xs-center">
 
-    <div v-if="runners.length > 0">
-    <v-expansion-panel dark>   
-    <v-expansion-panel-content>
-        <v-layout slot="header" row wrap class="body-2">
+    <div v-if="runners">
+    <v-expansion-panel light >   
+    <v-expansion-panel-content class="secondary">
+        <v-layout slot="header" row wrap class="body-2 primary--text">
             BET OPTIONS
         </v-layout>
-        <v-card pa-0 dark>
+        <v-card pa-0 light>
             <v-card-text class="grey--text text--lighten-5">
                 <v-flex xs12 md12 >
                     <v-switch @click.native.stop  v-model="eachway" color="red" label="Each Way"></v-switch>                              
@@ -31,6 +31,7 @@
                 </v-flex>
                 
                 <v-flex xs6 md5><span class="grey--text">Name</span></v-flex>
+
                 <v-flex md1 class="hidden-sm-and-down">
                     <span class="grey--text">Forecast</span>
                 </v-flex>
@@ -49,8 +50,8 @@
         </v-card-text>
       </v-card>    
     </v-expansion-panel-content>
-  </v-expansion-panel>
-    <v-expansion-panel light focusable>
+  </v-expansion-panel >
+    <v-expansion-panel light focusable v-if="runners">
         <v-expansion-panel-content v-for="runner in runners" :key="'runner' + runner.Number">
             <v-layout slot="header"  row wrap class="body-2">
                 <v-flex xs12 md12 >
@@ -67,92 +68,100 @@
                     
                     
                     <v-flex xs6 md5 class="font-weight-bold">{{runner.Name}}</v-flex>
-                    <v-flex md1 class="hidden-sm-and-down">
+                    
+                    <v-flex v-if="runner.racingpostdata" md1 class="hidden-sm-and-down">
                         <span class="font-weight-bold blue--text">{{runner.racingpostdata.forecast_odds_desc}}</span>
                     </v-flex>
+                    <v-flex v-else  md1 class="hidden-sm-and-down">
+
+                    </v-flex>
                     <v-flex xs3 md4>
-                        <v-checkbox  class="justify-center" v-model="selections"  @click.native.stop  :value="runner.UID">
+                        <v-checkbox multiple class="justify-center" v-model="selections"  @click.native.stop  :value="runner.UID">
                         </v-checkbox>
                     </v-flex>
                     <v-flex xs1></v-flex>       
                     </v-layout>              
-                </v-flex>                     
+                </v-flex>         
             </v-layout>
             <racingpostrunnerinfo :racingpostdata="runner.racingpostdata" ></racingpostrunnerinfo>           
         </v-expansion-panel-content>
     </v-expansion-panel>
+    <v-card dark class="headline" flat>
+        <v-card-title pb-1 v-if='!validbet'>No Valid Bet</v-card-title>
+        <template v-else >
+        <v-card-title pb-1 ><span class="cyan--text text--lighten-3">tote</span><span class="cyan--text ">Win</span></v-card-title>  
+        <v-card-text pb-1>
+            <v-container fluid grid-list-md>
+                <v-layout row wrap>
+                    <v-flex xs12 md6 d-flex>
+                        <v-layout row wrap>
+                            <v-flex xs12 sm12 md12  d-flex v-for="selection in selectedrunners" :key="selection.UID">                          
+                                <v-layout row wrap>
+                                    <v-flex xs3 dflex class="cyan--text body-1">
+                                        WIN
+                                    </v-flex>
+                                    <v-flex xs2 dflex class="caption">
+                                        ({{selection.Number}})
+                                    </v-flex>
+                                    <v-flex xs6 dflex class="body-1">
+                                        {{selection.Name}}
+                                    </v-flex>
+                                </v-layout>
+                            </v-flex>
+                        </v-layout>
+                    </v-flex>
+                    <v-flex xs12 md6 d-flex>
+                        <v-layout row wrap align-center justify-space-around >
+                    <v-flex xs12 md12 d-flex>
+                        <v-layout row wrap align-center justify-space-around >
+                        <v-flex xs3 md2>
+                            
+                        </v-flex>
+                        <v-flex xs1 md2>
+                            <span>{{lines}}</span>
+                        </v-flex>
+                        <v-flex xs1 md2>
+                            <span>X</span>
+                        </v-flex>
+                        <v-flex xs6 md4>
+                            <v-text-field dark
+                                v-model="stake"
+                                label="Stake"
+                                :rules="[rules.minstake]"
+                                prefix="£"
+                                type="number"
+                            ></v-text-field>
+                        </v-flex>
+                        </v-layout>
+                    </v-flex>
 
-
-            <v-card dark class="headline" flat>
-            <v-card-title pb-1 v-if='!validbet'>No Valid Bet</v-card-title>
-            <template v-else >
-            <v-card-title pb-1 ><span class="cyan--text text--lighten-3">tote</span><span class="cyan--text ">Win</span></v-card-title>  
-            <v-card-text pb-1>
-                <v-container fluid grid-list-md>
-                    <v-layout row wrap>
-                        <v-flex xs12 md6 d-flex>
-                            <v-layout row wrap>
-                                <v-flex xs12 sm12 md12  d-flex v-for="selection in selectedrunners" :key="selection.UID">                          
-                                    <v-layout row wrap>
-                                        <v-flex xs3 dflex class="cyan--text body-1">
-                                            WIN
-                                        </v-flex>
-                                        <v-flex xs2 dflex class="caption">
-                                            ({{selection.Number}})
-                                        </v-flex>
-                                        <v-flex xs6 dflex class="body-1">
-                                            {{selection.Name}}
-                                        </v-flex>
-                                    </v-layout>
-                                </v-flex>
-                            </v-layout>
+                    <v-flex xs12 md12 d-flex>
+                        <v-layout row wrap align-center justify-space-around >                
+                        <v-flex xs5 sm3>
+                            <v-text-field dark
+                                v-model="total"
+                                label="Total"
+                                :rules="[rules.mintotalstake, rules.maxtotalstake]"
+                                prefix="£"
+                                type="number"
+                                readonly
+                            ></v-text-field>
                         </v-flex>
-                        <v-flex xs12 md6 d-flex>
-                            <v-layout row wrap align-center justify-space-around >
-                        <v-flex xs12 md12 d-flex>
-                            <v-layout row wrap align-center justify-space-around >
-                            <v-flex xs3 md2>
-                                
-                            </v-flex>
-                            <v-flex xs1 md2>
-                                <span>{{lines}}</span>
-                            </v-flex>
-                            <v-flex xs1 md2>
-                                <span>X</span>
-                            </v-flex>
-                            <v-flex xs6 md4>
-                                <v-text-field dark
-                                    v-model="stake"
-                                    label="Stake"
-                                    :rules="[rules.minstake]"
-                                    prefix="£"
-                                    type="number"
-                                ></v-text-field>
-                            </v-flex>
-                            </v-layout>
-                        </v-flex>
-
-                        <v-flex xs12 md12 d-flex>
-                            <v-layout row wrap align-center justify-space-around >                
-                            <v-flex xs5 sm3>
-                                <v-text-field dark
-                                    v-model="total"
-                                    label="Total"
-                                    :rules="[rules.mintotalstake, rules.maxtotalstake]"
-                                    prefix="£"
-                                    type="number"
-                                    readonly
-                                ></v-text-field>
-                            </v-flex>
-                            </v-layout>
-                        </v-flex>
-                            </v-layout>
-                        </v-flex>
-                    </v-layout>
-                </v-container>
-            </v-card-text>
-            </template>
-        </v-card>
+                        </v-layout>
+                    </v-flex>
+                        </v-layout>
+                    </v-flex>
+                    
+                <v-flex>
+                    <v-btn @click="addtobetslip()">
+                        Click me
+                    </v-btn>
+                </v-flex>            
+                </v-layout>
+            </v-container>
+        </v-card-text>
+        </template>
+    </v-card>
 
     </div>
     <div v-else>
@@ -215,10 +224,9 @@ export default {
             'Race'
             ],
     computed: {
-        ...mapGetters([ 'todaysrunners', 'getRunnersByRaceUID' ]),
+        ...mapGetters([ 'getRaceRunners' ]),
     runners: function(){
-
-        return  this.getRunnersByRaceUID(this.Race.UID);
+        return  this.getRaceRunners(this.Race.UID);
     },
     validbet: function(){
         return this.selections.length >=1 ? true : false;
@@ -233,6 +241,7 @@ export default {
       },
     selectedrunners: function(){
         let selections = this.selections.map( selection => {
+            console.log("selectedrunners - ", selections)
             var runner = this.runners.find( runner => runner.UID == selection )
             return {
                 ...runner,
@@ -246,6 +255,11 @@ export default {
     }
     },
     methods:{
+        addtobetslip(){
+            let targetwindow = window.parent;
+
+            targetwindow.postMessage( { event:"ADD-TO-BETSLIP", data:"Hi There"}, "*" )
+        }
     
   },
     created(){

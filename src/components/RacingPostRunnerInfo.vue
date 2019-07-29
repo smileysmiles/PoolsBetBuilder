@@ -48,7 +48,7 @@
             </v-card-text>
         </v-card>                               
         <v-card v-else>
-            <v-card-text class="grey lighten-5"><div class="pa-2">Unfortunately no racing post data has been found. Please be assured we are looking into this.</div>                 
+            <v-card-text class="grey lighten-5"><div class="pa-2">Unfortunately no racing post data has been found. This maybe because you are viewing a virtual race.</div>                 
             </v-card-text>
         </v-card>
     </div>

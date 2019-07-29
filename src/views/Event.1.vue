@@ -1,8 +1,9 @@
   <template>
     <div>
-      <v-container class="mt-1" pa-0>
+      
+      <v-container pa-0>
         <v-layout row wrap>
-          <v-flex xs12 class="secondary px-2">
+          <v-flex xs7 class="white px-2">
             <v-select
               v-if="todaysMeetings"
               v-model="course"
@@ -12,54 +13,41 @@
               label="Todays Meetings"
               @change="changeRoute"
               color="accent"
-              class="mx-2 mt-4 white--text"
+              class="mx-1 mt-2 white--text body-2"
               light
               ></v-select>
           </v-flex>
-        
-          <v-flex xs12 v-if="selectedMeeting">
-            <template v-if="meetingPoolTabs.length == 1">
-                <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="meetingPoolTabs[0]=='Placepot'" flat>
 
-                    <placepot :meeting="selectedMeeting" :pooluid="pooluid(meetingPoolTabs[0])"></placepot>
-                  </v-card>
-                  <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="meetingPoolTabs[0]=='Jackpot'" flat>
-                    
-                  </v-card>
-                  <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="meetingPoolTabs[0]=='Quadpot'" flat>
-                    
-                  </v-card>
-            </template>
-            <template v-else>
-              
-            <v-tabs grow  color="secondary" light slider-color="accent">
-              
-              <v-tab v-for="item in meetingPoolTabs" :key="item" ripple>
-                {{item}}
-              </v-tab>
-                <v-tab-item v-for="item in meetingPoolTabs" :key="item">
-                  <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="item=='Placepot'" flat>
-                    <placepot :meeting="selectedMeeting" :pooluid="pooluid(item)"></placepot>
-                  </v-card>
-                  <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="item=='Jackpot'" flat>
-                    
-                  </v-card>
-                  <!-- ****************************** START TAB ***************************************** -->
-                  <v-card v-if="item=='Quadpot'" flat>
-                    
-                  </v-card>
-                </v-tab-item>
-          </v-tabs>
-            </template>
+          <v-flex xs5 class="white px-2">
+            <v-select
+              v-if="meetingPoolTabs"
+              v-model="selectedpool"
+              :items="meetingPoolTabs"
+              item-text="item"
+              item-value="item"
+              label="Meeting Pools"
+              color="accent"
+              class="mx-1 mt-2 white--text body-2"
+              light
+              ></v-select>
           </v-flex>
 
-          <v-flex xs12>
-          
+          <v-flex xs12 v-if="selectedMeeting && !loading">
+                  <!-- ****************************** START TAB ***************************************** -->
+                  <v-card v-if="selectedpool=='Placepot'" flat>
+                    <placepot :meeting="selectedMeeting" :pooluid="pooluid(selectedpool)"></placepot>
+                  </v-card>
+                  <!-- ****************************** START TAB ***************************************** -->
+                  <v-card v-if="selectedpool=='Jackpot'" flat>
+                    <jackpot :meeting="selectedMeeting" :pooluid="pooluid(selectedpool)"></jackpot>
+                  </v-card>
+                  <!-- ****************************** START TAB ***************************************** -->
+                  <v-card v-if="selectedpool=='Quadpot'" flat>
+                    <quadpot :meeting="selectedMeeting" :pooluid="pooluid(selectedpool)"></quadpot>
+                  </v-card>
+          </v-flex>
+          <v-flex xs12 v-if="loading">
+            <loading></loading>
           </v-flex>
 <!-- 
       <v-select
@@ -78,8 +66,10 @@
 </template>
 <script>
 import moment from 'moment';
- import { mapGetters, mapActions } from 'vuex'
- import TodaysCourseRaces from '../components/TodaysCourseRaces.vue'
+import { mapGetters, mapActions } from 'vuex'
+import TodaysCourseRaces from '../components/TodaysCourseRaces.vue'
+import Jackpot from '../components/Jackpot.vue'
+import Quadpot from '../components/Quadpot.vue'
 
 export default {
   name: 'Event',
@@ -87,11 +77,15 @@ export default {
     return {
       viaJs: require('@/assets/haydock.jpg') ,
       course: "null",
-      race: "null"
+      race: "null",
+      selectedpool:"Placepot",
+      loading:false
     }
   },
   components:{
-     'todayscourseraces' : TodaysCourseRaces
+     'todayscourseraces' : TodaysCourseRaces,
+     'jackpot' : Jackpot,
+     'quadpot' : Quadpot,
   },
   computed: {
     ...mapGetters([ 'getTodaysMeetings', 'getMeetingRaces', 'getRaceRunners', 'getPoolRaces' ]),
@@ -113,9 +107,11 @@ export default {
     }
   },
   async created () {
+    this.loading = true
     this.course = this.$route.params.course
     await this.$store.dispatch('getTodaysCourseData', this.course);
     console.log("Data Loaded")
+    this.loading = false
   },
   methods:{
     changeRoute: function(event){
@@ -136,9 +132,20 @@ export default {
   },
   watch:{
     '$route' (to, from){
-      this.course = this.$route.params.course
-      this.$store.dispatch('getTodaysCourseData', this.course);
+      this.loading = true;
+      console.log("TO", to)
+      console.log("from", from)
+      if(from.params.course != to.params.course )
+      {
+        this.selectedpool = "Placepot"
+        this.course = to.params.course;
+        this.$store.dispatch('getTodaysCourseData', to.params.course).then(() => {
+          this.loading = false;
+        })        
+      }
+      
     }
+
   }
 }
 </script>

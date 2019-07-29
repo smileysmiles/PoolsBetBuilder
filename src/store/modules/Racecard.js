@@ -10,6 +10,7 @@ const state = {
     runners: [],
     dataloading: false,
     meetingpools: [],
+    racepools:[],
     poolraces: []
 };
 
@@ -20,8 +21,14 @@ const mutations = {
     'ADD_MEETING_RACES' ( state, race ) {
         state.races.push( ...race);
     },
+    'ADD_MEETING_RACE' ( state, race ) {
+        state.races.push( race);
+    },
     'ADD_RACE_RUNNERS' ( state, racerunners ) {
         state.runners.push(racerunners);
+    },
+    'ADD_RACE_POOLS' ( state, racepools ) {
+        state.racepools.push(...racepools);
     },
     'ADD_MEETINGS' ( state, meetings ) {
         state.meetings = meetings;
@@ -44,8 +51,28 @@ const mutations = {
 // actions
 const actions = {
 
+    async getRaceData({ dispatch }, raceuid)
+    {
 
+        console.log("Get Race Data - ", raceuid)
+        try{
+        //Load Race
+        await dispatch('getRace', raceuid);
+        //Load Race Pools
+        
+        await dispatch('getRacePools', raceuid);        
 
+        //Load Race Runners
+        console.log("Getting Race Runners")
+        await dispatch('getRaceRunners', raceuid);
+        console.log("Completed Getting Race Runners");
+
+        }
+        catch(err)
+        {
+            console.log("Error Getting Race Data", err);
+        }
+    },
     async getTodaysCourseData({ commit, state, dispatch }, course)
     {
         if (state.dataloading)
@@ -83,39 +110,39 @@ const actions = {
         console.log("Meeting", meeting);
         //Load Races if required
         await Promise.all([
-            dispatch('getMeetingRaces', meeting.UID),
+            dispatch('populateMeetingRaces', meeting.UID),
             dispatch('getMeetingPools', meeting.UID)
         ])
         //Shape some data
         //Shouldnt need to wait for this.
         dispatch('BuildPoolRaces', meeting.UID);
     },
-    async getTodaysData({ commit, state, dispatch })
-    {
-        if (state.dataloading)
-            return;
+    // async getTodaysData({ commit, state, dispatch })
+    // {
+    //     if (state.dataloading)
+    //         return;
 
-        if ( state.racecards )
-        {
-            let todaysRacecard = state.racecards.find( racecard => racecard.DataID == date);
-            if (todaysRacecard)
-            {
-                //nothing to do
-                return;
-            }
-        }
-        commit('LOAD_DATA');
+    //     if ( state.racecards )
+    //     {
+    //         let todaysRacecard = state.racecards.find( racecard => racecard.DataID == date);
+    //         if (todaysRacecard)
+    //         {
+    //             //nothing to do
+    //             return;
+    //         }
+    //     }
+    //     commit('LOAD_DATA');
 
-        await Promise.all([
-            dispatch('getTodaysRacecard'),
-            dispatch('getTodaysRaces'),
-            dispatch('initRacepools'),
-            dispatch('initMeetingPools'),           
-            dispatch('getTodaysRunners')
-            ]);
+    //     await Promise.all([
+    //         dispatch('getTodaysRacecard'),
+    //         dispatch('getTodaysRaces'),
+    //         dispatch('initRacepools'),
+    //         dispatch('initMeetingPools'),           
+    //         dispatch('getTodaysRunners')
+    //         ]);
         
-        commit('DATA_LOADED');
-    },
+    //     commit('DATA_LOADED');
+    // },
     async getTodaysRacecard ({ commit }) {
         var url = 'https://azs0ed5o6l.execute-api.eu-west-2.amazonaws.com/dev/racecard/' + date() + '/Racecard'
         try
@@ -173,7 +200,75 @@ const actions = {
         }
          
     },
-    async getMeetingRaces ({ commit, state, dispatch }, meetingUID) {
+    async getRacePools({ commit }, raceuid )
+    {
+        ///race/{id}/pool
+
+        //Does it exist
+        if(state.racepools && state.racepools.length > 0)
+        {
+            let exists = state.racepools.filter(pool => pool.RaceUID == raceuid);
+            if (exists && exists.length > 0)
+            {
+                console.log("Race Pools already loaded", exists)
+                return
+            }
+        }
+
+        var url = `https://azs0ed5o6l.execute-api.eu-west-2.amazonaws.com/dev/race/${raceuid}/pool`;
+
+        try
+        {
+            let res = await axios.get(url)
+            if(res !== undefined && res.data !== undefined )
+            {
+                let pools = res.data.Items;
+                console.log("RACE POOLS", pools);
+                commit('ADD_RACE_POOLS', pools);
+                console.log("ADD_RACE_POOLS");
+               
+            }
+            return;
+        }
+        catch( error ) {
+            console.log("ADD_RACE_POOL: Fail - " + JSON.stringify(error))
+        }
+
+    },
+    async getRace({commit}, raceuid)
+    {
+        //Does it exist
+        if(state.races)
+        {
+            let exists = state.races.filter(race => race.UID == raceuid);
+            if (exists && exists.length > 0)
+            {
+                console.log("Race already loaded", exists)
+                return
+            }
+        }
+
+        var url = `https://azs0ed5o6l.execute-api.eu-west-2.amazonaws.com/dev/race/${raceuid}`;
+
+        try
+        {
+            let res = await axios.get(url)
+            if(res !== undefined && res.data !== undefined )
+            {
+                let race = res.data.Items[0];
+
+                console.log(res);
+                commit('ADD_MEETING_RACE', race);
+                console.log("ADD_MEETING_RACE");
+               
+            }
+            return;
+        }
+        catch( error ) {
+            console.log("ADD_MEETING_RACES: Fail - " + JSON.stringify(error))
+        }
+    },
+    async populateMeetingRaces ({ commit, state, dispatch }, meetingUID) {
 
         //Does it exist
         if(state.races)
@@ -187,7 +282,7 @@ const actions = {
         }
         console.log("Loading Meeting Races")
 
-        var url = `https://azs0ed5o6l.execute-api.eu-west-2.amazonaws.com/dev/race/${meetingUID}`;
+        var url = `https://azs0ed5o6l.execute-api.eu-west-2.amazonaws.com/dev/race/meeting/${meetingUID}`;
         
         try
         {
@@ -328,8 +423,15 @@ const getters ={
         return state.racecards.find( racecard => racecard.DataID == date());
     },
     getRunnersByRaceUID: (state) => (uid) => {
-        var runners =  state.runners.filter(todo => todo.RaceUID === uid);
-        return runners.sort((a, b) => a.Number - b.Number) ;
+        console.log("GET RUNNERS BY RACEUID - ", uid)
+        var runners =  state.runners.filter(todo => todo.raceuid === uid);
+        console.log("runners found - ", runners.length)
+        if ( runners & runners.length > 0 )
+        {
+            runners = runners.runners;
+            return runners.sort((a, b) => a.Number - b.Number) ;
+        }
+        return runners;
     },
     getMeetingByUID: (state, getters) => (uid) => {
         var meeting =  getters.todaysracecard.Meetings.filter(meeting => meeting.MeetingUID === uid);
@@ -339,10 +441,15 @@ const getters ={
         return state.meetings;
     },
     getMeetingRaces: ( state ) => ( meetinguid )=>{
-        console.log("meeting UID", meetinguid)
-        var races = state.races.filter(race => race.MeetingUID == meetinguid)
-        console.log("Meeting Races - ",races)    
-        return races;
+        if (state.races && state.races.length > 0)
+        {
+            console.log("meeting UID", meetinguid)
+            var races = state.races.filter(race => race.MeetingUID == meetinguid)
+            console.log("Meeting Races - ",races)    
+            return races;
+        }
+
+        return null;
     },
     getPoolRaces: ( state ) => ( meetinguid )=>{
         let poolRaces = state.poolraces.find(race => race.meetinguid == meetinguid);
@@ -352,6 +459,30 @@ const getters ={
         let items = JSON.parse(JSON.stringify(poolRaces.poolsRaces))
         let sortedPools = items.sort((a, b) => (a.firstleg - b.firstleg) )
         return sortedPools;
+    },
+    getQuadPotRaces: ( state ) => ( meetinguid )=>{
+        let quadpotraces = state.poolraces.find(race => race.meetinguid == meetinguid);
+        if(!quadpotraces)
+            return;
+
+        let poolraces = quadpotraces.poolsRaces.find( pool => pool.pool == "Quadpot");
+       
+        if (poolraces)
+            return poolraces;
+        
+        return poolraces;
+    },
+    getJackpotRaces: ( state ) => ( meetinguid )=>{
+        let jackpotraces = state.poolraces.find(race => race.meetinguid == meetinguid);
+        if(!jackpotraces)
+            return;
+
+        let poolraces = jackpotraces.poolsRaces.find( pool => pool.pool == "Jackpot");
+       
+        if (poolraces)
+            return poolraces;
+        
+        return poolraces;
     },
     getPlacePotRaces: ( state ) => ( meetinguid )=>{
         let placepotraces = state.poolraces.find(race => race.meetinguid == meetinguid);
@@ -366,11 +497,27 @@ const getters ={
         return poolraces;
     },
     getRaceRunners: ( state ) => ( raceuid )=>{
+        console.log("GET RACE RUNNERS - ", raceuid)
         var runners = state.runners.find(runner => runner.raceuid == raceuid)
         if (runners)
             return runners.runners;
         
         return runners;
+    },
+    getRacePools: ( state ) => ( raceuid )=>{
+        console.log("Get Race Pools - ", raceuid)
+        if(!state.racepools)
+            return null;
+        var pools = state.racepools.filter(pool => pool.RaceUID == raceuid)
+        
+        if (pools)
+        {
+            let sortedPools =  pools.sort((a, b) => a.Number - b.Number ) ;
+            sortedPools = sortedPools.filter( pool => pool.Name != "Place")
+            return sortedPools;
+        }
+        
+        return pools;
     },
     getRaceRunnersWithFav: ( state ) => ( raceuid )=>{
         var runners = state.runners.find(runner => runner.raceuid == raceuid)

@@ -17,8 +17,13 @@ export default new Router({
     },
     {
       path: '/Meeting/:course',
-      name: 'Events',
+      name: 'Meetings',
       component: () => import(/* webpackChunkName: "about" */ './views/Event.1.vue')
+    },
+    {
+      path: '/Races/:course',
+      name: 'Races',
+      component: () => import(/* webpackChunkName: "about" */ './views/Races.vue')
     },
     {
       path: '/Meeting',
@@ -30,11 +35,6 @@ export default new Router({
     },
     {
       path: '/race/:UID',
-      name: 'Race',
-      component: () => import('./views/Race.vue')
-    },
-    {
-      path: '/multileg/:UID',
       name: 'Race',
       component: () => import('./views/Race.vue')
     },
